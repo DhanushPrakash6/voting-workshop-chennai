@@ -16,7 +16,7 @@ describe("Voting", () => {
     provider = new BankrunProvider(context);
     votingProgram = new anchor.Program<Voting>(
       IDL,
-      provider,
+      provider, 
     );
   });
 
@@ -25,9 +25,8 @@ describe("Voting", () => {
       new anchor.BN(1),
       "What is your favorite color?",
       new anchor.BN(100),
-      new anchor.BN(2533201883),
+      new anchor.BN(3077836800),
     ).rpc();
-
     const [pollAddress] = PublicKey.findProgramAddressSync(
       [new anchor.BN(1).toArrayLike(Buffer, "le", 8)],
       votingProgram.programId,
@@ -40,6 +39,15 @@ describe("Voting", () => {
     expect(poll.pollId.toNumber()).toBe(1);
     expect(poll.description).toBe("What is your favorite color?");
     expect(poll.pollStart.toNumber()).toBe(100);
+  });
+
+  it("initializing poll with past timestamp", async () => {
+    await votingProgram.methods.initializePoll(
+      new anchor.BN(1),
+      "What is your favorite fruit?",
+      new anchor.BN(100),
+      new anchor.BN(1577836800),
+    ).rpc();
   });
 
   it("initializes candidates", async () => {

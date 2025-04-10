@@ -219,6 +219,11 @@
       "code": 6000,
       "name": "PollNotActive",
       "msg": "Poll is not active"
+    },
+    {
+      "code": 6001,
+      "name": "PollEndInPast",
+      "msg": "The poll end time must be in the future."
     }
   ],
   "types": [

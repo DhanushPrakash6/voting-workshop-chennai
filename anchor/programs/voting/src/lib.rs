@@ -4,7 +4,7 @@ use anchor_lang::prelude::*;
 
 declare_id!("coUnmi3oBUtwtd9fjeAvSsJssXh5A5xyPbhpewyzRVF");
 
-#[program]
+#[program] 
 pub mod voting {
     use super::*;
 
@@ -12,7 +12,11 @@ pub mod voting {
                             poll_id: u64,
                             description: String,
                             poll_start: u64,
-                            poll_end: u64) -> Result<()> {
+                            poll_end: u64) -> Result<()> {                      
+        let clock = Clock::get()?;
+        let current_time = clock.unix_timestamp as u64;
+
+        require!(poll_end > current_time, VotingError::PollEndInPast);
 
         let poll = &mut ctx.accounts.poll;
         poll.poll_id = poll_id;
@@ -143,4 +147,6 @@ pub struct Poll {
 pub enum VotingError {
     #[msg("Poll is not active")]
     PollNotActive,
+    #[msg("The poll end time must be in the future.")]
+    PollEndInPast,
 }

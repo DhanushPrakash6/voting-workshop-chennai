@@ -225,6 +225,11 @@ export type Voting = {
       "code": 6000,
       "name": "pollNotActive",
       "msg": "Poll is not active"
+    },
+    {
+      "code": 6001,
+      "name": "pollEndInPast",
+      "msg": "The poll end time must be in the future."
     }
   ],
   "types": [
