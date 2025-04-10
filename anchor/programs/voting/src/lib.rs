@@ -78,7 +78,14 @@ pub struct Vote<'info> {
       bump
     )]
     pub candidate: Account<'info, Candidate>,
-
+    #[account(
+      init,
+      space = 8 + VoterRecord::INIT_SPACE,
+      payer = signer,
+      seeds = [poll_id.to_le_bytes().as_ref(), signer.key.as_ref()],
+      bump
+    )]
+    pub voter: Account<'info, VoterRecord>,
     pub system_program: Program<'info, System>,
 }
 
@@ -133,6 +140,10 @@ pub struct InitializePoll<'info> {
 
 #[account]
 #[derive(InitSpace)]
+pub struct VoterRecord {}
+
+#[account]
+#[derive(InitSpace)]
 pub struct Poll {
     pub poll_id: u64,
     #[max_len(200)]
@@ -150,3 +161,4 @@ pub enum VotingError {
     #[msg("The poll end time must be in the future.")]
     PollEndInPast,
 }
+

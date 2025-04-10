@@ -176,6 +176,22 @@ export type Voting = {
           }
         },
         {
+          "name": "voter",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "arg",
+                "path": "pollId"
+              },
+              {
+                "kind": "account",
+                "path": "signer"
+              }
+            ]
+          }
+        },
+        {
           "name": "systemProgram",
           "address": "11111111111111111111111111111111"
         }
@@ -217,6 +233,19 @@ export type Voting = {
         136,
         153,
         111
+      ]
+    },
+    {
+      "name": "voterRecord",
+      "discriminator": [
+        178,
+        96,
+        138,
+        116,
+        143,
+        202,
+        115,
+        33
       ]
     }
   ],
@@ -279,6 +308,13 @@ export type Voting = {
             "type": "u64"
           }
         ]
+      }
+    },
+    {
+      "name": "voterRecord",
+      "type": {
+        "kind": "struct",
+        "fields": []
       }
     }
   ]
