@@ -25,7 +25,7 @@ describe("Voting", () => {
       new anchor.BN(1),
       "What is your favorite color?",
       new anchor.BN(100),
-      new anchor.BN(1739370789),
+      new anchor.BN(2533201883),
     ).rpc();
 
     const [pollAddress] = PublicKey.findProgramAddressSync(

@@ -39,6 +39,12 @@ pub mod voting {
     pub fn vote(ctx: Context<Vote>, _candidate_name: String, _poll_id: u64) -> Result<()> {
         let candidate = &mut ctx.accounts.candidate;
         let poll = &mut ctx.accounts.poll;
+        let clock = Clock::get()?;
+        let current_time = clock.unix_timestamp as u64;
+        require!(
+          current_time >= poll.poll_start && current_time <= poll.poll_end,
+          VotingError::PollNotActive
+        );
         candidate.candidate_votes += 1;
         poll.total_votes += 1;
         msg!("Voted for candidate: {}", candidate.candidate_name);
@@ -131,4 +137,10 @@ pub struct Poll {
     pub poll_end: u64,
     pub candidate_amount: u64,
     pub total_votes: u64,
+}
+
+#[error_code]
+pub enum VotingError {
+    #[msg("Poll is not active")]
+    PollNotActive,
 }

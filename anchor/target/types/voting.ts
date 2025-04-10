@@ -220,6 +220,13 @@ export type Voting = {
       ]
     }
   ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "pollNotActive",
+      "msg": "Poll is not active"
+    }
+  ],
   "types": [
     {
       "name": "candidate",

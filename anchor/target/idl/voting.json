@@ -214,6 +214,13 @@
       ]
     }
   ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "PollNotActive",
+      "msg": "Poll is not active"
+    }
+  ],
   "types": [
     {
       "name": "Candidate",
