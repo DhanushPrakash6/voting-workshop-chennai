@@ -149,6 +149,7 @@ export type Voting = {
         },
         {
           "name": "poll",
+          "writable": true,
           "pda": {
             "seeds": [
               {
@@ -170,6 +171,22 @@ export type Voting = {
               {
                 "kind": "arg",
                 "path": "candidateName"
+              }
+            ]
+          }
+        },
+        {
+          "name": "voter",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "arg",
+                "path": "pollId"
+              },
+              {
+                "kind": "account",
+                "path": "signer"
               }
             ]
           }
@@ -217,6 +234,31 @@ export type Voting = {
         153,
         111
       ]
+    },
+    {
+      "name": "voterRecord",
+      "discriminator": [
+        178,
+        96,
+        138,
+        116,
+        143,
+        202,
+        115,
+        33
+      ]
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "pollNotActive",
+      "msg": "Poll is not active"
+    },
+    {
+      "code": 6001,
+      "name": "pollEndInPast",
+      "msg": "The poll end time must be in the future."
     }
   ],
   "types": [
@@ -260,8 +302,19 @@ export type Voting = {
           {
             "name": "candidateAmount",
             "type": "u64"
+          },
+          {
+            "name": "totalVotes",
+            "type": "u64"
           }
         ]
+      }
+    },
+    {
+      "name": "voterRecord",
+      "type": {
+        "kind": "struct",
+        "fields": []
       }
     }
   ]

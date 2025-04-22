@@ -143,6 +143,7 @@
         },
         {
           "name": "poll",
+          "writable": true,
           "pda": {
             "seeds": [
               {
@@ -164,6 +165,22 @@
               {
                 "kind": "arg",
                 "path": "candidate_name"
+              }
+            ]
+          }
+        },
+        {
+          "name": "voter",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "arg",
+                "path": "poll_id"
+              },
+              {
+                "kind": "account",
+                "path": "signer"
               }
             ]
           }
@@ -211,6 +228,31 @@
         153,
         111
       ]
+    },
+    {
+      "name": "VoterRecord",
+      "discriminator": [
+        178,
+        96,
+        138,
+        116,
+        143,
+        202,
+        115,
+        33
+      ]
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "PollNotActive",
+      "msg": "Poll is not active"
+    },
+    {
+      "code": 6001,
+      "name": "PollEndInPast",
+      "msg": "The poll end time must be in the future."
     }
   ],
   "types": [
@@ -254,8 +296,19 @@
           {
             "name": "candidate_amount",
             "type": "u64"
+          },
+          {
+            "name": "total_votes",
+            "type": "u64"
           }
         ]
+      }
+    },
+    {
+      "name": "VoterRecord",
+      "type": {
+        "kind": "struct",
+        "fields": []
       }
     }
   ]
