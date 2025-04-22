@@ -4,7 +4,7 @@ use anchor_lang::prelude::*;
 
 declare_id!("coUnmi3oBUtwtd9fjeAvSsJssXh5A5xyPbhpewyzRVF");
 
-#[program]
+#[program] 
 pub mod voting {
     use super::*;
 
@@ -12,7 +12,11 @@ pub mod voting {
                             poll_id: u64,
                             description: String,
                             poll_start: u64,
-                            poll_end: u64) -> Result<()> {
+                            poll_end: u64) -> Result<()> {                      
+        let clock = Clock::get()?;
+        let current_time = clock.unix_timestamp as u64;
+
+        require!(poll_end > current_time, VotingError::PollEndInPast);
 
         let poll = &mut ctx.accounts.poll;
         poll.poll_id = poll_id;
@@ -20,6 +24,7 @@ pub mod voting {
         poll.poll_start = poll_start;
         poll.poll_end = poll_end;
         poll.candidate_amount = 0;
+        poll.total_votes = 0;
         Ok(())
     }
 
@@ -27,18 +32,28 @@ pub mod voting {
                                 candidate_name: String,
                                 _poll_id: u64
                             ) -> Result<()> {
-        let candidate = &mut ctx.accounts.candidate;
+        let candidate = &mut ctx.accounts.candidate; 
+        let poll = &mut ctx.accounts.poll;
         candidate.candidate_name = candidate_name;
         candidate.candidate_votes = 0;
+        poll.candidate_amount += 1;
         Ok(())
     }
 
     pub fn vote(ctx: Context<Vote>, _candidate_name: String, _poll_id: u64) -> Result<()> {
         let candidate = &mut ctx.accounts.candidate;
+        let poll = &mut ctx.accounts.poll;
+        let clock = Clock::get()?;
+        let current_time = clock.unix_timestamp as u64;
+        require!(
+          current_time >= poll.poll_start && current_time <= poll.poll_end,
+          VotingError::PollNotActive
+        );
         candidate.candidate_votes += 1;
-
+        poll.total_votes += 1;
         msg!("Voted for candidate: {}", candidate.candidate_name);
         msg!("Votes: {}", candidate.candidate_votes);
+        msg!("Total votes in poll: {}", poll.total_votes);
         Ok(())
     }
 
@@ -51,6 +66,7 @@ pub struct Vote<'info> {
     pub signer: Signer<'info>,
 
     #[account(
+        mut,
         seeds = [poll_id.to_le_bytes().as_ref()],
         bump
       )]
@@ -62,7 +78,14 @@ pub struct Vote<'info> {
       bump
     )]
     pub candidate: Account<'info, Candidate>,
-
+    #[account(
+      init,
+      space = 8 + VoterRecord::INIT_SPACE,
+      payer = signer,
+      seeds = [poll_id.to_le_bytes().as_ref(), signer.key.as_ref()],
+      bump
+    )]
+    pub voter: Account<'info, VoterRecord>,
     pub system_program: Program<'info, System>,
 }
 
@@ -117,6 +140,10 @@ pub struct InitializePoll<'info> {
 
 #[account]
 #[derive(InitSpace)]
+pub struct VoterRecord {}
+
+#[account]
+#[derive(InitSpace)]
 pub struct Poll {
     pub poll_id: u64,
     #[max_len(200)]
@@ -124,4 +151,14 @@ pub struct Poll {
     pub poll_start: u64,
     pub poll_end: u64,
     pub candidate_amount: u64,
+    pub total_votes: u64,
 }
+
+#[error_code]
+pub enum VotingError {
+    #[msg("Poll is not active")]
+    PollNotActive,
+    #[msg("The poll end time must be in the future.")]
+    PollEndInPast,
+}
+
